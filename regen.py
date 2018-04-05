@@ -41,7 +41,7 @@ def plot_figure(*args):
 		stop = False
 		hp = []
 		time_list = []
-		current_hp = max_hp*0.1
+		current_hp = max_hp
 		stability_check_counter = 0
 		iteration_count = 0
 		anchor_time = 0
