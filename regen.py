@@ -19,42 +19,64 @@ def plot_figure(*args):
 		eff_dps = dps*(1-resist)
 		regen_term = 10*max_hp/recharge_time
 
-		#Simulation delta pulled from nowhere
-		delta = 0.04
+		#Simulation deltas pulled from nowhere
+		#Speeds up things a bit by using larger delta for bigger HP ships
+		delta = 0.08
 		
 		stop = False
 		hp = []
 		time_list = []
 		time_list.append(0)
 		hp.append(max_hp)
+		current_hp = max_hp
+		current_time = 0
+		stability_check_counter = 0
+		stability_check_hp = max_hp
 		
-
 		while stop == False:
-			time_list.append(time_list[-1]+delta)
+			
 			#1. apply damage
 			#2. check if died
 			#3. if not dead apply regeneration
 			
-			new_hp = hp[-1] - delta*eff_dps
+			stability_check_counter = stability_check_counter+1
+			
+			current_time = current_time + delta
+			current_hp = current_hp - delta*eff_dps
 			
 			#Check if died
-			if new_hp <= 0:
+			if current_hp <= 0:
 				#you died
-				hp.append(0)
+				current_hp = 0
 				stop = True
 				stable = False
 			else:
-				new_hp = min(new_hp + delta * regen_term *( math.sqrt(new_hp / max_hp) - (new_hp / max_hp) ), max_hp)
-				hp.append(new_hp)
+				old_hp = current_hp
+				current_hp = min(current_hp + delta * regen_term *( math.sqrt(current_hp / max_hp) - (current_hp / max_hp) ), max_hp)
 				
-				#Check if there is any change
-				#Start doing this check only after 10 iterations
-				if len(hp) > 10:
-					if math.isclose(hp[-1], hp[-10], rel_tol=0.00001, abs_tol=0.0):
-						stop = True
-						stable = True
+				
+				
+			
+			#To save memory on capital ships save only when there is change of at least 1%
+			percentage_old = round(100*hp[-1]/max_hp)
+			percentage_new = round(100*current_hp/max_hp)
+			if percentage_old > percentage_new:
+				#print(stability_check_counter, percentage_old,' ', percentage_new)
+				time_list.append(current_time)
+				hp.append(current_hp)
+				#print progress for over 10 million HP ships
+				if max_hp>10000000:
+					print(percentage_new,'%')
+					
+			#Check stability every 80 second
+			if stability_check_counter==1000:
+				if round(current_hp,4) >= round(stability_check_hp,4):
+					print(stability_check_counter, current_hp, old_hp)
+					stop = True
+					stable = True
+				stability_check_hp = current_hp
+				stability_check_counter = 0
 
-		
 		shield_percentage = 100*np.array(hp)/max_hp
 		
 		#Show results
