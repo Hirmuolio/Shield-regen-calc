@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import math
 from tkinter import *
 from tkinter import ttk
@@ -5,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #Things that happen when you press the button
-#Do math, draw figure
+#Do math, show results, draw figure
 def plot_figure(*args):
 	try:
 		max_hp = int(input_max_hp.get())
@@ -17,9 +19,8 @@ def plot_figure(*args):
 		eff_dps = dps*(1-resist)
 		regen_term = 10*max_hp/recharge_time
 
-		#predetermined things
+		#Simulation delta pulled from nowhere
 		delta = 0.04;
-		max_duration = 18000;
 		
 		stop = False
 		hp = []
@@ -29,8 +30,6 @@ def plot_figure(*args):
 		
 
 		while stop == False:
-			
-			
 			time_list.append(time_list[-1]+delta)
 			#1. apply damage
 			#2. check if died
@@ -55,12 +54,11 @@ def plot_figure(*args):
 						stop = True
 						stable=True
 
-			
 		
-		peak_regen.set( str(round(2.5*max_hp/(recharge_time*(1-resist))))+' EHP/s' )
+		shield_percentage = 100*np.array(hp)/max_hp
 		
 		#Show results
-		shield_percentage = 100*np.array(hp)/max_hp
+		peak_regen.set( str(round(2.5*max_hp/(recharge_time*(1-resist))))+' EHP/s ('+ str(round(2.5*max_hp/recharge_time)) + ' HP/s)')
 		
 		if stable == False:
 			minutes = math.floor(time_list[-1]/60)
@@ -78,11 +76,8 @@ def plot_figure(*args):
 		plt.grid(True)
 		axes = plt.gca()
 		axes.set_ylim([0,100])
-
 		axes.set_xlim([0,max(axes.get_xlim()[1], time_list[-1])])
 		plt.show()
-		
-		
 
 	except ValueError:
 		print('Something went wrong. Probably invalid input.')
@@ -112,16 +107,16 @@ input_recharge_time = StringVar()
 input_resist = StringVar()
 input_dps = StringVar()
 
+#Outputs
 peak_regen = StringVar()
 tank_time = StringVar()
 damage_tanked = StringVar()
 
-#input field labels
+#Input field labels
 ttk.Label(window, text="Shield max HP: ").grid(column=1, row=1, sticky=E)
 ttk.Label(window, text="Shield recharge time:").grid(column=1, row=2, sticky=E)
 ttk.Label(window, text="Shield resist (%):").grid(column=1, row=3, sticky=E)
 ttk.Label(window, text="Incoming DPS:").grid(column=1, row=4, sticky=E)
-
 
 #input fields
 max_hp_entry = ttk.Entry(window, width=7, textvariable=input_max_hp)
@@ -129,17 +124,18 @@ recharge_time_entry = ttk.Entry(window, width=7, textvariable=input_recharge_tim
 resist_entry = ttk.Entry(window, width=7, textvariable=input_resist)
 dps_entry = ttk.Entry(window, width=7, textvariable=input_dps)
 
-#input field positions
+#Input field positions
 max_hp_entry.grid(column=2, row=1, sticky=(W, E))
 recharge_time_entry.grid(column=2, row=2, sticky=(W, E))
 resist_entry.grid(column=2, row=3, sticky=(W, E))
 dps_entry.grid(column=2, row=4, sticky=(W, E))
 
-#Output fields
+#Output field labels
 ttk.Label(window, text="Peak regen:").grid(column=1, row=6, sticky=E)
 ttk.Label(window, text="Tank time:").grid(column=1, row=7, sticky=E)
 ttk.Label(window, text="Damage received:").grid(column=1, row=8, sticky=E)
 
+#Output fields
 ttk.Label(window, textvariable=peak_regen).grid(column=2, row=6, sticky=(W, E))
 ttk.Label(window, textvariable=tank_time).grid(column=2, row=7, sticky=(W, E))
 ttk.Label(window, textvariable=damage_tanked).grid(column=2, row=8, sticky=(W, E))
@@ -147,7 +143,6 @@ ttk.Label(window, textvariable=damage_tanked).grid(column=2, row=8, sticky=(W, E
 #Buttons
 ttk.Button(window, text="Plot", command=plot_figure).grid(column=2, row=5, sticky=W)
 ttk.Button(window, text="Clear", command=clear_all).grid(column=3, row=5, sticky=W)
-
 
 for child in window.winfo_children(): child.grid_configure(padx=5, pady=5)
 
