@@ -44,8 +44,6 @@ def plot_figure(*args):
 		current_hp = max_hp
 		stability_check_counter = 0
 		iteration_count = 0
-		anchor_time = 0
-		anchor_hp = current_hp
 
 		while stop == False:
 			#1. apply damage
@@ -58,8 +56,6 @@ def plot_figure(*args):
 			#cycle accurate damage
 			if (iteration_count*delta)%cycle == 0:
 				current_hp = current_hp - volley
-				anchor_hp = current_hp
-				anchor_time = current_time
 			
 			#Check if died
 			if current_hp <= 0:
@@ -68,10 +64,7 @@ def plot_figure(*args):
 				stop = True
 				stable = False
 			else:
-				if cycle_simulate:
-					current_hp = max_hp * ( 1 + math.exp(5*(anchor_time-current_time)/recharge_time) * ( math.sqrt(anchor_hp/max_hp) -1) )**2
-				else:
-					current_hp = min(current_hp + (delta/100) * regen_term *( math.sqrt(current_hp / max_hp) - (current_hp / max_hp) ), max_hp)
+				current_hp = min(current_hp + (delta/100) * regen_term *( math.sqrt(current_hp / max_hp) - (current_hp / max_hp) ), max_hp)
 			
 			old_percentage = round(old_hp/max_hp, 2)
 			new_percentage = round(current_hp/max_hp, 2)
