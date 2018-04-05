@@ -20,7 +20,7 @@ def plot_figure(*args):
 		regen_term = 10*max_hp/recharge_time
 
 		#Simulation delta pulled from nowhere
-		delta = 0.04;
+		delta = 0.04
 		
 		stop = False
 		hp = []
@@ -42,9 +42,9 @@ def plot_figure(*args):
 				#you died
 				hp.append(0)
 				stop = True
-				stable=False
+				stable = False
 			else:
-				new_hp = new_hp + delta * regen_term *( math.sqrt(new_hp / max_hp) - (new_hp / max_hp) );
+				new_hp = min(new_hp + delta * regen_term *( math.sqrt(new_hp / max_hp) - (new_hp / max_hp) ), max_hp)
 				hp.append(new_hp)
 				
 				#Check if there is any change
@@ -52,7 +52,7 @@ def plot_figure(*args):
 				if len(hp) > 10:
 					if math.isclose(hp[-1], hp[-10], rel_tol=0.00001, abs_tol=0.0):
 						stop = True
-						stable=True
+						stable = True
 
 		
 		shield_percentage = 100*np.array(hp)/max_hp
