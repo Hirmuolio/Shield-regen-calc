@@ -32,7 +32,7 @@ def plot_figure(*args):
 		
 		#Do the math and then plot the figure
 		eff_dps = dps*(1-resist)
-		#regen_term = 10*max_hp/recharge_time
+		regen_term = 10*max_hp/recharge_time
 
 
 		cycle = cycle - cycle%delta
@@ -41,7 +41,7 @@ def plot_figure(*args):
 		stop = False
 		hp = []
 		time_list = []
-		current_hp = max_hp
+		current_hp = max_hp*0.1
 		stability_check_counter = 0
 		iteration_count = 0
 		anchor_time = 0
@@ -68,9 +68,10 @@ def plot_figure(*args):
 				stop = True
 				stable = False
 			else:
-				#current_hp = min(current_hp + (delta/100) * regen_term *( math.sqrt(current_hp / max_hp) - (current_hp / max_hp) ), max_hp)
-				
-				current_hp = max_hp * ( 1 + math.exp(5*(anchor_time-current_time)/recharge_time) * ( math.sqrt(anchor_hp/max_hp) -1) )**2
+				if cycle_simulate:
+					current_hp = max_hp * ( 1 + math.exp(5*(anchor_time-current_time)/recharge_time) * ( math.sqrt(anchor_hp/max_hp) -1) )**2
+				else:
+					current_hp = min(current_hp + (delta/100) * regen_term *( math.sqrt(current_hp / max_hp) - (current_hp / max_hp) ), max_hp)
 			
 			old_percentage = round(old_hp/max_hp, 2)
 			new_percentage = round(current_hp/max_hp, 2)
