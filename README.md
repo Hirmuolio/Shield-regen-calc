@@ -1,4 +1,4 @@
-#Shield regen calculator
+# Shield regen calculator
 
 This calculator calculates how passive shield regeneration works on shields
 
